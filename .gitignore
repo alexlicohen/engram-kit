@@ -1,0 +1,32 @@
+# Raw connector pulls, exports and run state: never committed (provenance is by source id)
+_sources/
+*.mbox
+*.eml
+conversations.json
+
+# OS / editor / agent-local cruft
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+# Re-include the project skills: many machines ignore .claude/ globally (core.excludesFile).
+!.claude/
+.claude/agent-memory/
+.claude/settings.local.json
+
+# Python bytecode / test caches
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# On-demand digests: generated live by scripts/gen_digests.py, never committed
+digests/action-items.md
+digests/decisions.md
+
+# Shell-variable accidents: an unquoted "> $VAR" with VAR unset writes a literal "$out"-style file at
+# the repo root, which can hold raw source bodies. Never commit raw source.
+$*
+
+# engram-profile run state (reader worklists, drafts): local only. _profile/metrics/ describes the
+# owner — commit it only in a private store.
+_profile/state/

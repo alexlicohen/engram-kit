@@ -1,0 +1,24 @@
+name: verify
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: pip install pytest
+      - name: full gate (lint -> phi-scan -> tests)
+        run: make verify
+      - name: derived-views freshness + integrity gates
+        run: bash scripts/check.sh
+      - name: distiller prompts render (needs node)
+        run: python3 scripts/check_distiller_prompts.py

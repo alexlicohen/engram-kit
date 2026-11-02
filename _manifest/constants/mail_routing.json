@@ -1,0 +1,12 @@
+{
+ "_comment": "Header-only routing for the mail selectors (gmail_select, gmail_secondary_select, mbox_triage, outlook_select); read by scripts/_lib/mail_routing.py, which documents every key. PROVISIONAL: the distiller reads the body and sets the authoritative domain. Every list ships EMPTY or with illustrative example.* rules: fill in your own institutions, senders and labels.",
+ "phi_screen_sender_domains": [],
+ "clinical_task_senders": [],
+ "domain_rules": [
+  {"domain": "ventures", "sender_domains": ["(^|\\.)mycompany\\.example$"], "labels": ["^MyCompany\\b"]},
+  {"domain": "finance", "labels": ["\\b(accounting|taxes|bills)\\b"], "subjects": ["\\b(invoice|receipt|k-1|1099|w-2)\\b"]},
+  {"domain": "research", "subjects": ["\\b(grant|manuscript|study section|biosketch|irb)\\b"]},
+  {"domain": "personal", "subpath": "travel", "labels": ["\\btravel\\b"], "subjects": ["\\b(itinerary|booking confirmation)\\b"]},
+  {"domain": "personal", "labels": ["\\b(family|social|school)\\b"], "sender_domains": ["(^|\\.)(gmail|yahoo|hotmail|icloud|outlook)\\.com$"]}
+ ]
+}

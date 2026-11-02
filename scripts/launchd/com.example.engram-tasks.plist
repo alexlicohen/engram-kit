@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- TEMPLATE. Copy to ~/Library/LaunchAgents/<your label>.plist and replace: the Label (keep it
+	     equal to the file name), every /Users/you path, and ENGRAM_ROOT. launchd does not expand ~
+	     or $VARS in these strings: write absolute paths. -->
+	<key>Label</key>
+	<string>com.example.engram-tasks</string>
+	<!-- Runs via the applet wrapper (not bare zsh): TCC attributes the child osascript's
+	     Apple Events to the RESPONSIBLE process, and an .app is the identity TCC can prompt
+	     for and remember — bare zsh under launchd gets a stuck, ungrantable toggle.
+	     Rebuild the applet with:
+	     osacompile -o ~/Library/Scripts/EngramTasksNightly.app \
+	       -e 'do shell script "/bin/zsh /Users/you/engram/scripts/tasks_nightly.sh"' -->
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/you/Library/Scripts/EngramTasksNightly.app/Contents/MacOS/applet</string>
+	</array>
+	<!-- 4am daily; fires on wake if the Mac slept through 4am. -->
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>4</integer>
+		<key>Minute</key>
+		<integer>0</integer>
+	</dict>
+	<!-- Covers full power-off nights: fires at login; the wrapper's <20h
+	     last-success guard deduplicates against the 4am fire. -->
+	<key>RunAtLoad</key>
+	<true/>
+	<!-- Without this, launchd runs the job at background QoS and Apple Events crawl
+	     (measured: the ~1s interactive Reminders scan exceeds 300s throttled). -->
+	<key>ProcessType</key>
+	<string>Interactive</string>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>ENGRAM_ROOT</key>
+		<string>/Users/you/engram</string>
+		<!-- OFF by default: deterministic core only. Flip to 1 to also attempt a headless
+		     `claude -p /engram-sync` (see the engram-tasks skill before doing so). -->
+		<key>ENGRAM_NIGHTLY_CLAUDE</key>
+		<string>0</string>
+	</dict>
+	<key>StandardOutPath</key>
+	<string>/Users/you/Library/Logs/engram-tasks.log</string>
+	<key>StandardErrPath</key>
+	<string>/Users/you/Library/Logs/engram-tasks.err.log</string>
+</dict>
+</plist>

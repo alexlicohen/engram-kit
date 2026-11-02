@@ -1,0 +1,17 @@
+{
+ "_comment": "Apple Reminders routing for scripts/engram_tasks.py (apply_config documents every key). domain_to_list keys must be domains in domains.json; a waiting_on row goes to '<owned list><waiting_suffix>'. entity_rules: [{\"list\": \"<an entity's own list>\", \"pattern\": \"<case-insensitive regex>\"}] for finance tasks that belong to one entity. never_write: lists engram must never create a reminder in (e.g. an hours or billing log). extra_lists: hand-managed lists to include in the reconcile read scope.",
+ "inbox_list": "Engram Inbox",
+ "waiting_list": "Waiting On",
+ "waiting_suffix": " — Waiting On",
+ "domain_to_list": {
+  "research": "Research",
+  "work": "Work",
+  "ventures": "Ventures",
+  "finance": "Financial",
+  "personal": "Personal",
+  "health": "Personal"
+ },
+ "entity_rules": [],
+ "never_write": [],
+ "extra_lists": []
+}

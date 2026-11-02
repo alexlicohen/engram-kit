@@ -1,0 +1,33 @@
+{
+  "_comment": "High-water marks for connector-based incremental sync (see _manifest/SYNC.md). bump_watermark.py moves one after a successful sync, before its commit. One writer at a time: the committed watermark is the handoff between syncs. Keep only the sources you use.",
+  "granola": {
+    "account": "<your Granola account e-mail>",
+    "watermark_date": null,
+    "note": "Latest distilled meeting date (day-granular). Incremental = meetings since this date, minus those already holding a granola:<id> note, distilled by _granola-pending/granola_new.mjs. Null until the first sync completes."
+  },
+  "gmail_personal": {
+    "account": "<the Gmail account the Claude Gmail connector is signed in to>",
+    "watermark_date": null,
+    "note": "Latest distilled thread date (day-granular). Incremental = search_threads(after:<date>), minus threads already holding a gmail:thread:<id> note (gmail_worklist.py). Grown threads go to gmail_update.mjs, which does not move this watermark."
+  },
+  "gmail_secondary": {
+    "account": "<the secondary account exported with Google Takeout>",
+    "watermark_date": null,
+    "note": "Latest distilled thread date of the mbox pipeline (gmail_secondary_select.py -> gmail_secondary_worklist.py -> gmail_secondary_distill.mjs)."
+  },
+  "outlook": {
+    "account": "<your work mailbox>",
+    "watermark_date": null,
+    "note": "Latest distilled thread date (day-granular). A backlog source: a computed watermark behind this one is a no-op, not an error. Export .eml files after this date into _sources/outlook/."
+  },
+  "imessage": {
+    "source": "~/Library/Messages/chat.db",
+    "watermark_date": null,
+    "note": "TIMESTAMP regime (ISO-8601 UTC): the max message instant imsg_extract.py processed (_sources/imessage.maxts). Pass it to imsg_select.py / imsg_extract.py --since."
+  },
+  "whatsapp": {
+    "source": "the native Mac WhatsApp app's ChatStorage.sqlite",
+    "watermark_date": null,
+    "note": "TIMESTAMP regime, like imessage (_sources/whatsapp.maxts). whatsapp_extract.py WITHOUT --since is a full backfill."
+  }
+}

@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# engram launcher — resolves the repo root from this script's own location (so it works from any
+# cwd) and pins the Python interpreter, then dispatches to the verification gate.
+#
+#   engram verify     the full gate (lint -> phi-scan -> test) via `make verify`
+#   engram lint       the typed store linter
+#   engram phi-scan   the store PHI audit (extra args forwarded, e.g. --summary)
+#   engram test       the pytest suite (extra args forwarded, e.g. -k wave)
+#
+# Override the interpreter with ENGRAM_PY=/path/to/python3.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PY="${ENGRAM_PY:-python3}"
+
+usage() {
+  echo "usage: engram {verify|lint|phi-scan|test} [args...]" >&2
+  exit 2
+}
+
+cmd="${1:-}"
+shift || true
+case "$cmd" in
+  verify)   exec make -C "$ROOT" verify PY="$PY" ;;
+  lint)     exec "$PY" "$ROOT/scripts/lint_store.py" "$@" ;;
+  phi-scan) exec "$PY" "$ROOT/scripts/phi_scan_store.py" "$@" ;;
+  test)     exec "$PY" -m pytest "$ROOT/scripts/tests/" "$@" ;;
+  ""|-h|--help) usage ;;
+  *)        echo "engram: unknown command '$cmd'" >&2; usage ;;
+esac

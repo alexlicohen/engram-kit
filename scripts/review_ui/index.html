@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>engram · review</title>
+  <style>
+    :root {
+      --bg: #14161a; --panel: #1c1f26; --panel2: #22262f; --edge: #30353f;
+      --ink: #e7e9ee; --muted: #9aa1ad; --accent: #6ea8fe; --accent-ink: #0b1220;
+      --good: #4ec98a; --bad: #e0705f; --warn: #e0b45f;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      background: var(--bg); color: var(--ink); font: 14px/1.5 -apple-system, BlinkMacSystemFont,
+      "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; height: 100vh;
+    }
+    header {
+      display: flex; align-items: center; gap: 16px; padding: 10px 16px;
+      border-bottom: 1px solid var(--edge); background: var(--panel);
+    }
+    header .brand { font-weight: 700; letter-spacing: .3px; }
+    header .brand span { color: var(--muted); font-weight: 400; }
+    .tabs { display: flex; gap: 4px; }
+    .tab {
+      padding: 6px 12px; border-radius: 7px; cursor: pointer; color: var(--muted);
+      background: transparent; border: 1px solid transparent;
+    }
+    .tab.on { color: var(--ink); background: var(--panel2); border-color: var(--edge); }
+    .spacer { flex: 1; }
+    .toolbar { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; }
+    button, select {
+      font: inherit; color: var(--ink); background: var(--panel2); border: 1px solid var(--edge);
+      border-radius: 7px; padding: 5px 10px; cursor: pointer;
+    }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+    button.danger { border-color: var(--bad); color: var(--bad); }
+    button.good { border-color: var(--good); color: var(--good); }
+    button:disabled { opacity: .45; cursor: default; }
+    main { flex: 1; display: grid; grid-template-columns: 340px 1fr; min-height: 0; }
+    .list { border-right: 1px solid var(--edge); overflow-y: auto; background: var(--panel); }
+    .group-hdr {
+      position: sticky; top: 0; background: var(--panel); padding: 8px 14px 4px;
+      font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted);
+      border-bottom: 1px solid var(--edge);
+    }
+    .row {
+      padding: 9px 14px; border-bottom: 1px solid var(--edge); cursor: pointer;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .row:hover { background: var(--panel2); }
+    .row.sel { background: #2a3140; box-shadow: inset 3px 0 0 var(--accent); }
+    .row.done { opacity: .5; }
+    .row .r-title { font-size: 13px; }
+    .row .r-meta { font-size: 11px; color: var(--muted); }
+    .cat { font-size: 10px; padding: 1px 6px; border-radius: 4px; background: var(--panel2); border: 1px solid var(--edge); color: var(--muted); }
+    .detail { overflow-y: auto; padding: 22px 26px; }
+    .detail .q { font-size: 17px; font-weight: 600; margin: 0 0 4px; }
+    .detail .sub { color: var(--muted); margin: 0 0 18px; font-size: 13px; }
+    .card { background: var(--panel); border: 1px solid var(--edge); border-radius: 10px; padding: 16px 18px; margin-bottom: 16px; }
+    .card h3 { margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+    .evidence { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; font-size: 13px; }
+    .evidence dt { color: var(--muted); }
+    .evidence dd { margin: 0; }
+    .cands { display: flex; flex-direction: column; gap: 8px; }
+    .cand { text-align: left; display: flex; gap: 10px; align-items: baseline; padding: 9px 12px; }
+    .cand .num { display: inline-flex; width: 20px; height: 20px; align-items: center; justify-content: center;
+      border-radius: 5px; background: var(--panel2); border: 1px solid var(--edge); font-size: 11px; color: var(--muted); flex: none; }
+    .freetext { display: flex; gap: 8px; margin-top: 4px; }
+    .freetext input { flex: 1; font: inherit; color: var(--ink); background: var(--panel2); border: 1px solid var(--edge); border-radius: 7px; padding: 8px 10px; }
+    pre.note { white-space: pre-wrap; word-wrap: break-word; background: var(--panel2); border: 1px solid var(--edge);
+      border-radius: 8px; padding: 14px; font: 12px/1.55 "SF Mono", ui-monospace, Menlo, monospace; max-height: 55vh; overflow: auto; }
+    .msg { margin-top: 12px; font-size: 13px; }
+    .msg.ok { color: var(--good); } .msg.err { color: var(--bad); } .msg.warn { color: var(--warn); }
+    .confirm-box { border: 1px solid var(--warn); border-radius: 10px; padding: 14px 16px; background: color-mix(in srgb, var(--warn) 10%, transparent); margin-top: 12px; }
+    .confirm-box ul { margin: 8px 0; padding-left: 20px; font: 12px/1.5 ui-monospace, Menlo, monospace; color: var(--muted); }
+    .hint { color: var(--muted); font-size: 12px; margin-top: 18px; }
+    .empty { color: var(--muted); padding: 40px; text-align: center; }
+    .pill { font-size: 11px; padding: 1px 7px; border-radius: 5px; border: 1px solid var(--edge); color: var(--muted); }
+    .reason { width: 100%; font: inherit; color: var(--ink); background: var(--panel2); border: 1px solid var(--edge); border-radius: 7px; padding: 8px 10px; margin: 8px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">engram <span>· review</span></div>
+    <div class="tabs">
+      <div class="tab on" data-view="clarify">Clarify</div>
+      <div class="tab" data-view="sensitive">Sensitive holds</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="toolbar" id="toolbar"></div>
+  </header>
+  <main>
+    <div class="list" id="list"></div>
+    <div class="detail" id="detail"><div class="empty">Loading…</div></div>
+  </main>
+  <script src="/review_ui/app.js"></script>
+</body>
+</html>
