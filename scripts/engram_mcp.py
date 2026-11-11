@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["mcp>=1.2"]
+# dependencies = ["mcp>=1.2,<3"]
 # ///
 """engram MCP server — read-only recall of the engram store from any MCP client (Claude Desktop).
 
@@ -17,7 +17,7 @@ email / iMessage / PHI-holding). Every read path is gated so those never reach a
   - paths are realpath-resolved and contained to the repo root (no `..`/symlink escape).
 There are NO write tools. Nothing here mutates the store.
 
-The `mcp` SDK is imported lazily inside main() so this module (and its pure, security-critical
+The `mcp` SDK (1.x or 2.x) is imported lazily in build_app() so this module (and its pure, security-critical
 helpers) imports cleanly under the repo's Python 3.9 pytest suite without the SDK installed.
 
 Run (Claude Desktop launches it this way via claude_desktop_config.json):
@@ -231,13 +231,25 @@ def engram_brief() -> str:
     return cp.stdout.rstrip()
 
 
-def main() -> None:
-    from mcp.server.fastmcp import FastMCP  # lazy: keeps this module importable without the SDK
+TOOLS = (engram_index, engram_people, engram_grep, engram_read, engram_frontmatter, engram_brief)
 
-    app = FastMCP("engram")
-    for fn in (engram_index, engram_people, engram_grep, engram_read, engram_frontmatter, engram_brief):
-        app.tool()(fn)
-    app.run()
+
+def build_app(wrap=None):
+    """The MCP app with the six read-only tools. `wrap` (fn -> fn) lets the HTTP front end
+    (engram_mcp_http.py) add access logging without owning a second tool list."""
+    try:  # lazy: keeps this module importable without the SDK
+        from mcp.server.mcpserver import MCPServer  # mcp 2.x
+    except ImportError:
+        from mcp.server.fastmcp import FastMCP as MCPServer  # mcp 1.x
+
+    app = MCPServer("engram")
+    for fn in TOOLS:
+        app.tool()(wrap(fn) if wrap else fn)
+    return app
+
+
+def main() -> None:
+    build_app().run()
 
 
 if __name__ == "__main__":

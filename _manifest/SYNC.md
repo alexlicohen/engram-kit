@@ -140,6 +140,13 @@ addresses (or labelled Sent), minus Spam/Trash. The distiller still drops non-du
    **metadata for the Python steps only** (dates, senders); the distiller never takes a fact from them.
    `gmail_render.py` refuses (exit 2, old render kept) a thread that is not a verbatim connector dump
    (missing `historyId`, `date` ≠ `internalDate`) or is truncated.
+   **Unreachable message:** `get_thread` omits drafts and trashed/deleted messages Gmail still counts,
+   so a response can show `messageCount` − 1 and be refused as truncated. If a SECOND
+   `get_thread(METADATA_ONLY)` shows the same shortfall, render with
+   `gmail_render.py <resp.json> --allow-missing <thrid>=<N>` (N ≤ 2, exact match, per thread); the
+   header records `| missing: N`. `<resp.json>` must hold that ONE get_thread object: a search page or
+   a list is refused, and so is a thread showing exactly 5 messages (it cannot be told from a search
+   page's newest-5 cut; it stays pending).
 4. **Capture the grown-thread set NOW**: `python3 scripts/gmail_update_worklist.py` (see below) —
    before the new notes are committed.
 5. `python3 scripts/gmail_worklist.py _sources/gmail-wave.jsonl _sources/gmail-pending.jsonl
@@ -309,7 +316,8 @@ sync. Detail: the `/engram-tasks` skill.
 - **Renders are metadata.** An agent relaying a large tool result inline can retype it; a verbatim
   connector dump carries `historyId`/`labelIds`. `search_threads` shows only a thread's newest 5
   messages, and `resultCountEstimate` under-reports — paginate. A `get_thread(METADATA_ONLY)` that
-  counts a draft can come back one message short of `messageCount`; the render is refused (fail-closed).
+  counts a draft or a trashed message can come back short of `messageCount`; the render is refused
+  unless `--allow-missing` names that thread and that exact shortfall (step 3).
 - **A worker can mis-key `provenance.ref`** from a neighbouring record: the filename's id suffix not
   matching the ref is the tell (lint warns on slug/ref mismatches).
 - **Chat sources yield 0..n notes per chunk**, so `sync_verify`'s count needs `--dropped` and can
